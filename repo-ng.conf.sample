@@ -25,6 +25,12 @@ repo
     max-packets 100000
   }
 
+  soap
+  {
+    host "localhost"
+    port "9090"
+  }
+
   ; Section to enable TCP bulk insert capability
   ; If section is present, then TCP bulk insert is enabled (empty section enables
   ; TCP bulk insert to listen on "localhost:7376")

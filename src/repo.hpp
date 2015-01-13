@@ -29,6 +29,7 @@
 #include "handles/watch-handle.hpp"
 #include "handles/delete-handle.hpp"
 #include "handles/tcp-bulk-insert-handle.hpp"
+#include "handles/soap-handle.hpp"
 
 #include "common.hpp"
 
@@ -45,6 +46,7 @@ struct RepoConfig
   std::vector<ndn::Name> dataPrefixes;
   std::vector<ndn::Name> repoPrefixes;
   std::vector<std::pair<std::string, std::string> > tcpBulkInsertEndpoints;
+  std::vector<std::pair<std::string, int> > soapEndpoints;
   int64_t nMaxPackets;
   boost::property_tree::ptree validatorNode;
 };
@@ -91,6 +93,7 @@ private:
   WatchHandle m_watchHandle;
   DeleteHandle m_deleteHandle;
   TcpBulkInsertHandle m_tcpBulkInsertHandle;
+  SoapHandle m_soapHandle;
 };
 
 } // namespace repo

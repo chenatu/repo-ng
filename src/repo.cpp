@@ -99,6 +99,30 @@ parseConfig(const std::string& configPath)
     repoConfig.tcpBulkInsertEndpoints.push_back(std::make_pair(host, port));
   }
 
+  ptree soap = repoConf.get_child("soap");
+  bool isSoap = false;
+  std::string soapHost = "localhost";
+  int soapPort = 9090;
+  for (ptree::const_iterator it = soap.begin();
+       it != soap.end();
+       ++it)
+  {
+    isSoap = true;
+
+    if (it->first == "host") {
+      soapHost = it->second.get_value<std::string>();
+    }
+    else if (it->first == "port") {
+      soapPort = it->second.get_value<int>();
+    }
+    else
+      throw Repo::Error("Unrecognized '" + it->first + "' option in 'soap' section in "
+                        "configuration file '"+ configPath +"'");
+  }
+  if (isSoap) {
+    repoConfig.soapEndpoints.push_back(std::make_pair(soapHost, soapPort));
+  }
+
   if (repoConf.get<std::string>("storage.method") != "sqlite")
     throw Repo::Error("Only 'sqlite' storage method is supported");
 
@@ -123,6 +147,7 @@ Repo::Repo(boost::asio::io_service& ioService, const RepoConfig& config)
   , m_watchHandle(m_face, m_storageHandle, m_keyChain, m_scheduler, m_validator)
   , m_deleteHandle(m_face, m_storageHandle, m_keyChain, m_scheduler, m_validator)
   , m_tcpBulkInsertHandle(ioService, m_storageHandle)
+  , m_soapHandle(ioService, m_storageHandle)
 
 {
   m_validator.load(config.validatorNode, config.repoConfigPath);
@@ -166,6 +191,13 @@ Repo::enableListening()
        ++it)
     {
       m_tcpBulkInsertHandle.listen(it->first, it->second);
+    }
+
+    for (auto it = m_config.soapEndpoints.begin();
+       it != m_config.soapEndpoints.end();
+       ++it)
+    {
+      m_soapHandle.listen(it->first.c_str(), it->second);
     }
 }
 

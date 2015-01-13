@@ -19,6 +19,7 @@
 
 #include "config.hpp"
 #include "repo.hpp"
+#include "handles/ns.nsmap"
 
 static const std::string ndnRepoUsageMessage =
   /* argv[0] */ " - Next generation of NDN repository\n"
