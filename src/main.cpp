@@ -29,6 +29,7 @@ static const std::string ndnRepoUsageMessage =
 
 void
 terminate(boost::asio::io_service& ioService,
+          repo::Repo& repoInstance,
           const boost::system::error_code& error,
           int signalNo,
           boost::asio::signal_set& signalSet)
@@ -40,12 +41,13 @@ terminate(boost::asio::io_service& ioService,
       signalNo == SIGTERM)
     {
       ioService.stop();
+      repoInstance.close();
       std::cout << "Caught signal '" << strsignal(signalNo) << "', exiting..." << std::endl;
     }
   else
     {
       /// \todo May be try to reload config file
-      signalSet.async_wait(std::bind(&terminate, std::ref(ioService),
+      signalSet.async_wait(std::bind(&terminate, std::ref(ioService), std::ref(repoInstance),
                                      std::placeholders::_1, std::placeholders::_2,
                                      std::ref(signalSet)));
     }
@@ -79,7 +81,7 @@ main(int argc, char** argv)
     signalSet.add(SIGHUP);
     signalSet.add(SIGUSR1);
     signalSet.add(SIGUSR2);
-    signalSet.async_wait(std::bind(&terminate, std::ref(ioService),
+    signalSet.async_wait(std::bind(&terminate, std::ref(ioService), std::ref(repoInstance),
                                    std::placeholders::_1, std::placeholders::_2,
                                    std::ref(signalSet)));
 

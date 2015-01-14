@@ -207,4 +207,10 @@ Repo::enableValidation()
   m_validator.load(m_config.validatorNode, m_config.repoConfigPath);
 }
 
+void
+Repo::close()
+{
+  m_soapHandle.stop();
+}
+
 } // namespace repo

@@ -80,6 +80,9 @@ public:
   void
   enableValidation();
 
+  void
+  close();
+
 private:
   RepoConfig m_config;
   ndn::Scheduler m_scheduler;

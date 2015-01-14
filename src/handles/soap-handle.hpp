@@ -1,6 +1,7 @@
 #ifndef REPO_HANDLES_SOAP_HANDLE_HPP
 #define REPO_HANDLES_SOAP_HANDLE_HPP
 
+#include <sys/socket.h>
 #include "boost/thread.hpp"
 #include <boost/scoped_ptr.hpp>
 #include "common.hpp"
@@ -28,6 +29,7 @@ public:
   SoapHandle(boost::asio::io_service& ioService, RepoStorage& storageHandle)
     : m_ioService(ioService),
       m_service(Service(storageHandle)),
+      m_masterFd(-1),
       m_work(new boost::asio::io_service::work(m_ioService)),
       m_thread(boost::bind(&boost::asio::io_service::run, &m_ioService))
   {
@@ -35,9 +37,10 @@ public:
 
   ~SoapHandle()
   {
-    m_work.reset();
+    std::cout << "call soap handle destructor" << std::endl;
+    //m_work.reset();
     m_thread.join();
-    m_service.destroy();
+    //m_service.destroy();
   }
 
   void
@@ -54,6 +57,20 @@ public:
   }
 
   void
+  stop()
+  {
+    std::cout << "call stop" << std::endl;
+    if (m_masterFd > 0) {
+      if (close(m_masterFd) == -1) {
+        std::cout << "close failed" <<std::endl;
+      }
+    }
+    m_work.reset();
+    //m_thread.join();
+    m_service.destroy();
+  }
+
+  void
   asyncAccept()
   {
     std::cout << "async accept..." << std::endl;
@@ -64,6 +81,10 @@ public:
   acceptOperation()
   {
     std::cout << "start to accept" << std::endl;
+    if (m_ioService.stopped()) {
+      std::cout << "io_service stopped" << std::endl;
+      return;
+    }
     int acceptFd = m_service.accept();
     std::cout << "after accept" << std::endl;
     if (acceptFd > 0) {
