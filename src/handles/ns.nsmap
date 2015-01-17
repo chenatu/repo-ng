@@ -1,5 +1,3 @@
-#ifndef ns_NSMAP
-#define ns_NSMAP
 
 #include "soapH.h"
 SOAP_NMAC struct Namespace namespaces[] =
@@ -11,5 +9,3 @@ SOAP_NMAC struct Namespace namespaces[] =
 	{"ns", "http://tempuri.org/ns.xsd", NULL, NULL},
 	{NULL, NULL, NULL, NULL}
 };
-
-#endif

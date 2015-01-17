@@ -66,5 +66,13 @@ class SOAP_CMAC Proxy : public soap
 	/// Web service operation 'read' (returns error code or SOAP_OK)
 	virtual	int read(std::vector<unsigned char >interest, std::vector<unsigned char >*response) { return this->read(NULL, NULL, interest, response); }
 	virtual	int read(const char *endpoint, const char *soap_action, std::vector<unsigned char >interest, std::vector<unsigned char >*response);
+
+	/// Web service operation 'insert' (returns error code or SOAP_OK)
+	virtual	int insert(std::vector<unsigned char >data, int *response) { return this->insert(NULL, NULL, data, response); }
+	virtual	int insert(const char *endpoint, const char *soap_action, std::vector<unsigned char >data, int *response);
+
+	/// Web service operation 'remove' (returns error code or SOAP_OK)
+	virtual	int remove(std::vector<unsigned char >interest, int *response) { return this->remove(NULL, NULL, interest, response); }
+	virtual	int remove(const char *endpoint, const char *soap_action, std::vector<unsigned char >interest, int *response);
 };
 #endif

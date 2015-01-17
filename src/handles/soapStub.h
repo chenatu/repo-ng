@@ -66,15 +66,63 @@ public:
 };
 #endif
 
+#ifndef SOAP_TYPE_ns__insertResponse
+#define SOAP_TYPE_ns__insertResponse (16)
+/* ns:insertResponse */
+struct ns__insertResponse
+{
+public:
+	int *response;	/* SOAP 1.2 RPC return element (when namespace qualified) */	/* optional element of type xsd:int */
+public:
+	int soap_type() const { return 16; } /* = unique type id SOAP_TYPE_ns__insertResponse */
+};
+#endif
+
+#ifndef SOAP_TYPE_ns__insert
+#define SOAP_TYPE_ns__insert (17)
+/* ns:insert */
+struct ns__insert
+{
+public:
+	std::vector<unsigned char >data;	/* required element of type xsd:unsignedByte */
+public:
+	int soap_type() const { return 17; } /* = unique type id SOAP_TYPE_ns__insert */
+};
+#endif
+
+#ifndef SOAP_TYPE_ns__removeResponse
+#define SOAP_TYPE_ns__removeResponse (19)
+/* ns:removeResponse */
+struct ns__removeResponse
+{
+public:
+	int *response;	/* SOAP 1.2 RPC return element (when namespace qualified) */	/* optional element of type xsd:int */
+public:
+	int soap_type() const { return 19; } /* = unique type id SOAP_TYPE_ns__removeResponse */
+};
+#endif
+
+#ifndef SOAP_TYPE_ns__remove
+#define SOAP_TYPE_ns__remove (20)
+/* ns:remove */
+struct ns__remove
+{
+public:
+	std::vector<unsigned char >interest;	/* required element of type xsd:unsignedByte */
+public:
+	int soap_type() const { return 20; } /* = unique type id SOAP_TYPE_ns__remove */
+};
+#endif
+
 #ifndef WITH_NOGLOBAL
 
 #ifndef SOAP_TYPE_SOAP_ENV__Header
-#define SOAP_TYPE_SOAP_ENV__Header (14)
+#define SOAP_TYPE_SOAP_ENV__Header (21)
 /* SOAP Header: */
 struct SOAP_ENV__Header
 {
 public:
-	int soap_type() const { return 14; } /* = unique type id SOAP_TYPE_SOAP_ENV__Header */
+	int soap_type() const { return 21; } /* = unique type id SOAP_TYPE_SOAP_ENV__Header */
 };
 #endif
 
@@ -83,7 +131,7 @@ public:
 #ifndef WITH_NOGLOBAL
 
 #ifndef SOAP_TYPE_SOAP_ENV__Code
-#define SOAP_TYPE_SOAP_ENV__Code (15)
+#define SOAP_TYPE_SOAP_ENV__Code (22)
 /* SOAP Fault Code: */
 struct SOAP_ENV__Code
 {
@@ -91,7 +139,7 @@ public:
 	char *SOAP_ENV__Value;	/* optional element of type xsd:QName */
 	struct SOAP_ENV__Code *SOAP_ENV__Subcode;	/* optional element of type SOAP-ENV:Code */
 public:
-	int soap_type() const { return 15; } /* = unique type id SOAP_TYPE_SOAP_ENV__Code */
+	int soap_type() const { return 22; } /* = unique type id SOAP_TYPE_SOAP_ENV__Code */
 };
 #endif
 
@@ -100,7 +148,7 @@ public:
 #ifndef WITH_NOGLOBAL
 
 #ifndef SOAP_TYPE_SOAP_ENV__Detail
-#define SOAP_TYPE_SOAP_ENV__Detail (17)
+#define SOAP_TYPE_SOAP_ENV__Detail (24)
 /* SOAP-ENV:Detail */
 struct SOAP_ENV__Detail
 {
@@ -109,7 +157,7 @@ public:
 	int __type;	/* any type of element <fault> (defined below) */
 	void *fault;	/* transient */
 public:
-	int soap_type() const { return 17; } /* = unique type id SOAP_TYPE_SOAP_ENV__Detail */
+	int soap_type() const { return 24; } /* = unique type id SOAP_TYPE_SOAP_ENV__Detail */
 };
 #endif
 
@@ -118,14 +166,14 @@ public:
 #ifndef WITH_NOGLOBAL
 
 #ifndef SOAP_TYPE_SOAP_ENV__Reason
-#define SOAP_TYPE_SOAP_ENV__Reason (20)
+#define SOAP_TYPE_SOAP_ENV__Reason (27)
 /* SOAP-ENV:Reason */
 struct SOAP_ENV__Reason
 {
 public:
 	char *SOAP_ENV__Text;	/* optional element of type xsd:string */
 public:
-	int soap_type() const { return 20; } /* = unique type id SOAP_TYPE_SOAP_ENV__Reason */
+	int soap_type() const { return 27; } /* = unique type id SOAP_TYPE_SOAP_ENV__Reason */
 };
 #endif
 
@@ -134,7 +182,7 @@ public:
 #ifndef WITH_NOGLOBAL
 
 #ifndef SOAP_TYPE_SOAP_ENV__Fault
-#define SOAP_TYPE_SOAP_ENV__Fault (21)
+#define SOAP_TYPE_SOAP_ENV__Fault (28)
 /* SOAP Fault: */
 struct SOAP_ENV__Fault
 {
@@ -149,7 +197,7 @@ public:
 	char *SOAP_ENV__Role;	/* optional element of type xsd:string */
 	struct SOAP_ENV__Detail *SOAP_ENV__Detail;	/* optional element of type SOAP-ENV:Detail */
 public:
-	int soap_type() const { return 21; } /* = unique type id SOAP_TYPE_SOAP_ENV__Fault */
+	int soap_type() const { return 28; } /* = unique type id SOAP_TYPE_SOAP_ENV__Fault */
 };
 #endif
 

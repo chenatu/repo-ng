@@ -162,4 +162,110 @@ int Proxy::read(const char *endpoint, const char *soap_action, std::vector<unsig
 		*response = *soap_tmp_ns__readResponse->response;
 	return soap_closesock(soap);
 }
+
+int Proxy::insert(const char *endpoint, const char *soap_action, std::vector<unsigned char >data, int *response)
+{	struct soap *soap = this;
+	struct ns__insert soap_tmp_ns__insert;
+	struct ns__insertResponse *soap_tmp_ns__insertResponse;
+	if (endpoint)
+		soap_endpoint = endpoint;
+	soap_begin(soap);
+	soap->encodingStyle = NULL;
+	soap_tmp_ns__insert.data = data;
+	soap_serializeheader(soap);
+	soap_serialize_ns__insert(soap, &soap_tmp_ns__insert);
+	if (soap_begin_count(soap))
+		return soap->error;
+	if (soap->mode & SOAP_IO_LENGTH)
+	{	if (soap_envelope_begin_out(soap)
+		 || soap_putheader(soap)
+		 || soap_body_begin_out(soap)
+		 || soap_put_ns__insert(soap, &soap_tmp_ns__insert, "ns:insert", NULL)
+		 || soap_body_end_out(soap)
+		 || soap_envelope_end_out(soap))
+			 return soap->error;
+	}
+	if (soap_end_count(soap))
+		return soap->error;
+	if (soap_connect(soap, soap_url(soap, soap_endpoint, NULL), soap_action)
+	 || soap_envelope_begin_out(soap)
+	 || soap_putheader(soap)
+	 || soap_body_begin_out(soap)
+	 || soap_put_ns__insert(soap, &soap_tmp_ns__insert, "ns:insert", NULL)
+	 || soap_body_end_out(soap)
+	 || soap_envelope_end_out(soap)
+	 || soap_end_send(soap))
+		return soap_closesock(soap);
+	if (!response)
+		return soap_closesock(soap);
+	soap_default_int(soap, response);
+	if (soap_begin_recv(soap)
+	 || soap_envelope_begin_in(soap)
+	 || soap_recv_header(soap)
+	 || soap_body_begin_in(soap))
+		return soap_closesock(soap);
+	soap_tmp_ns__insertResponse = soap_get_ns__insertResponse(soap, NULL, "ns:insertResponse", NULL);
+	if (!soap_tmp_ns__insertResponse || soap->error)
+		return soap_recv_fault(soap, 0);
+	if (soap_body_end_in(soap)
+	 || soap_envelope_end_in(soap)
+	 || soap_end_recv(soap))
+		return soap_closesock(soap);
+	if (response && soap_tmp_ns__insertResponse->response)
+		*response = *soap_tmp_ns__insertResponse->response;
+	return soap_closesock(soap);
+}
+
+int Proxy::remove(const char *endpoint, const char *soap_action, std::vector<unsigned char >interest, int *response)
+{	struct soap *soap = this;
+	struct ns__remove soap_tmp_ns__remove;
+	struct ns__removeResponse *soap_tmp_ns__removeResponse;
+	if (endpoint)
+		soap_endpoint = endpoint;
+	soap_begin(soap);
+	soap->encodingStyle = NULL;
+	soap_tmp_ns__remove.interest = interest;
+	soap_serializeheader(soap);
+	soap_serialize_ns__remove(soap, &soap_tmp_ns__remove);
+	if (soap_begin_count(soap))
+		return soap->error;
+	if (soap->mode & SOAP_IO_LENGTH)
+	{	if (soap_envelope_begin_out(soap)
+		 || soap_putheader(soap)
+		 || soap_body_begin_out(soap)
+		 || soap_put_ns__remove(soap, &soap_tmp_ns__remove, "ns:remove", NULL)
+		 || soap_body_end_out(soap)
+		 || soap_envelope_end_out(soap))
+			 return soap->error;
+	}
+	if (soap_end_count(soap))
+		return soap->error;
+	if (soap_connect(soap, soap_url(soap, soap_endpoint, NULL), soap_action)
+	 || soap_envelope_begin_out(soap)
+	 || soap_putheader(soap)
+	 || soap_body_begin_out(soap)
+	 || soap_put_ns__remove(soap, &soap_tmp_ns__remove, "ns:remove", NULL)
+	 || soap_body_end_out(soap)
+	 || soap_envelope_end_out(soap)
+	 || soap_end_send(soap))
+		return soap_closesock(soap);
+	if (!response)
+		return soap_closesock(soap);
+	soap_default_int(soap, response);
+	if (soap_begin_recv(soap)
+	 || soap_envelope_begin_in(soap)
+	 || soap_recv_header(soap)
+	 || soap_body_begin_in(soap))
+		return soap_closesock(soap);
+	soap_tmp_ns__removeResponse = soap_get_ns__removeResponse(soap, NULL, "ns:removeResponse", NULL);
+	if (!soap_tmp_ns__removeResponse || soap->error)
+		return soap_recv_fault(soap, 0);
+	if (soap_body_end_in(soap)
+	 || soap_envelope_end_in(soap)
+	 || soap_end_recv(soap))
+		return soap_closesock(soap);
+	if (response && soap_tmp_ns__removeResponse->response)
+		*response = *soap_tmp_ns__removeResponse->response;
+	return soap_closesock(soap);
+}
 /* End of client proxy code */

@@ -11,18 +11,18 @@ compiling, linking, and/or using OpenSSL is allowed.
 #include "soapService.h"
 
 Service::Service(repo::RepoStorage& storageHandle) : m_storageHandle(storageHandle)
-{	Service_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
+{ Service_init(SOAP_IO_DEFAULT, SOAP_IO_DEFAULT);
 }
 
 Service::Service(const struct soap &_soap, repo::RepoStorage& storageHandle) : soap(_soap), m_storageHandle(storageHandle)
 { }
 
 Service::Service(soap_mode iomode, repo::RepoStorage& storageHandle) : m_storageHandle(storageHandle)
-{	Service_init(iomode, iomode);
+{ Service_init(iomode, iomode);
 }
 
 Service::Service(soap_mode imode, soap_mode omode, repo::RepoStorage& storageHandle) : m_storageHandle(storageHandle)
-{	Service_init(imode, omode);
+{ Service_init(imode, omode);
 }
 
 Service::~Service()
@@ -174,11 +174,17 @@ int Service::serve()
 }
 
 static int serve_ns__read(Service*);
+static int serve_ns__insert(Service*);
+static int serve_ns__remove(Service*);
 
 int Service::dispatch()
 {	soap_peek_element(this);
 	if (!soap_match_tag(this, this->tag, "ns:read"))
 		return serve_ns__read(this);
+	if (!soap_match_tag(this, this->tag, "ns:insert"))
+		return serve_ns__insert(this);
+	if (!soap_match_tag(this, this->tag, "ns:remove"))
+		return serve_ns__remove(this);
 	return this->error = SOAP_NO_METHOD;
 }
 
@@ -219,6 +225,94 @@ static int serve_ns__read(Service *soap)
 	 || soap_putheader(soap)
 	 || soap_body_begin_out(soap)
 	 || soap_put_ns__readResponse(soap, &soap_tmp_ns__readResponse, "ns:readResponse", NULL)
+	 || soap_body_end_out(soap)
+	 || soap_envelope_end_out(soap)
+	 || soap_end_send(soap))
+		return soap->error;
+	return soap_closesock(soap);
+}
+
+static int serve_ns__insert(Service *soap)
+{	struct ns__insert soap_tmp_ns__insert;
+	struct ns__insertResponse soap_tmp_ns__insertResponse;
+	int soap_tmp_int;
+	soap_default_ns__insertResponse(soap, &soap_tmp_ns__insertResponse);
+	soap_default_int(soap, &soap_tmp_int);
+	soap_tmp_ns__insertResponse.response = &soap_tmp_int;
+	soap_default_ns__insert(soap, &soap_tmp_ns__insert);
+	if (!soap_get_ns__insert(soap, &soap_tmp_ns__insert, "ns:insert", NULL))
+		return soap->error;
+	if (soap_body_end_in(soap)
+	 || soap_envelope_end_in(soap)
+	 || soap_end_recv(soap))
+		return soap->error;
+	soap->error = soap->insert(soap_tmp_ns__insert.data, soap_tmp_ns__insertResponse.response);
+	if (soap->error)
+		return soap->error;
+	soap->encodingStyle = NULL;
+	soap_serializeheader(soap);
+	soap_serialize_ns__insertResponse(soap, &soap_tmp_ns__insertResponse);
+	if (soap_begin_count(soap))
+		return soap->error;
+	if (soap->mode & SOAP_IO_LENGTH)
+	{	if (soap_envelope_begin_out(soap)
+		 || soap_putheader(soap)
+		 || soap_body_begin_out(soap)
+		 || soap_put_ns__insertResponse(soap, &soap_tmp_ns__insertResponse, "ns:insertResponse", NULL)
+		 || soap_body_end_out(soap)
+		 || soap_envelope_end_out(soap))
+			 return soap->error;
+	};
+	if (soap_end_count(soap)
+	 || soap_response(soap, SOAP_OK)
+	 || soap_envelope_begin_out(soap)
+	 || soap_putheader(soap)
+	 || soap_body_begin_out(soap)
+	 || soap_put_ns__insertResponse(soap, &soap_tmp_ns__insertResponse, "ns:insertResponse", NULL)
+	 || soap_body_end_out(soap)
+	 || soap_envelope_end_out(soap)
+	 || soap_end_send(soap))
+		return soap->error;
+	return soap_closesock(soap);
+}
+
+static int serve_ns__remove(Service *soap)
+{	struct ns__remove soap_tmp_ns__remove;
+	struct ns__removeResponse soap_tmp_ns__removeResponse;
+	int soap_tmp_int;
+	soap_default_ns__removeResponse(soap, &soap_tmp_ns__removeResponse);
+	soap_default_int(soap, &soap_tmp_int);
+	soap_tmp_ns__removeResponse.response = &soap_tmp_int;
+	soap_default_ns__remove(soap, &soap_tmp_ns__remove);
+	if (!soap_get_ns__remove(soap, &soap_tmp_ns__remove, "ns:remove", NULL))
+		return soap->error;
+	if (soap_body_end_in(soap)
+	 || soap_envelope_end_in(soap)
+	 || soap_end_recv(soap))
+		return soap->error;
+	soap->error = soap->remove(soap_tmp_ns__remove.interest, soap_tmp_ns__removeResponse.response);
+	if (soap->error)
+		return soap->error;
+	soap->encodingStyle = NULL;
+	soap_serializeheader(soap);
+	soap_serialize_ns__removeResponse(soap, &soap_tmp_ns__removeResponse);
+	if (soap_begin_count(soap))
+		return soap->error;
+	if (soap->mode & SOAP_IO_LENGTH)
+	{	if (soap_envelope_begin_out(soap)
+		 || soap_putheader(soap)
+		 || soap_body_begin_out(soap)
+		 || soap_put_ns__removeResponse(soap, &soap_tmp_ns__removeResponse, "ns:removeResponse", NULL)
+		 || soap_body_end_out(soap)
+		 || soap_envelope_end_out(soap))
+			 return soap->error;
+	};
+	if (soap_end_count(soap)
+	 || soap_response(soap, SOAP_OK)
+	 || soap_envelope_begin_out(soap)
+	 || soap_putheader(soap)
+	 || soap_body_begin_out(soap)
+	 || soap_put_ns__removeResponse(soap, &soap_tmp_ns__removeResponse, "ns:removeResponse", NULL)
 	 || soap_body_end_out(soap)
 	 || soap_envelope_end_out(soap)
 	 || soap_end_send(soap))

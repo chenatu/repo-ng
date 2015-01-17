@@ -16,13 +16,13 @@ class SOAP_CMAC Service : public soap
 { public:
 	/// Variables globally declared in soap-repo.h (non-static)
 	/// Constructor
-	Service(repo::RepoStorage& storageHandle);
-	/// Construct from another engine state
-	Service(const struct soap&, repo::RepoStorage& storageHandle);
-	/// Constructor with engine input+output mode control
-	Service(soap_mode iomode, repo::RepoStorage& storageHandle);
-	/// Constructor with engine input and output mode control
-	Service(soap_mode imode, soap_mode omode, repo::RepoStorage& storageHandle);
+  Service(repo::RepoStorage& storageHandle);
+  /// Construct from another engine state
+  Service(const struct soap&, repo::RepoStorage& storageHandle);
+  /// Constructor with engine input+output mode control
+  Service(soap_mode iomode, repo::RepoStorage& storageHandle);
+  /// Constructor with engine input and output mode control
+  Service(soap_mode imode, soap_mode omode, repo::RepoStorage& storageHandle);
 	/// Destructor, also frees all deserialized data
 	virtual ~Service();
 	/// Delete all deserialized data (with soap_destroy and soap_end)
@@ -82,7 +82,13 @@ class SOAP_CMAC Service : public soap
 	/// Web service operation 'read' (returns error code or SOAP_OK)
 	virtual	int read(std::vector<unsigned char >interest, std::vector<unsigned char >*response) SOAP_PURE_VIRTUAL;
 
+	/// Web service operation 'insert' (returns error code or SOAP_OK)
+	virtual	int insert(std::vector<unsigned char >data, int *response) SOAP_PURE_VIRTUAL;
+
+	/// Web service operation 'remove' (returns error code or SOAP_OK)
+	virtual	int remove(std::vector<unsigned char >interest, int *response) SOAP_PURE_VIRTUAL;
+
 private:
-	repo::RepoStorage& m_storageHandle;
+  repo::RepoStorage& m_storageHandle;
 };
 #endif

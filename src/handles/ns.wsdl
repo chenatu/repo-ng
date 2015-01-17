@@ -42,6 +42,38 @@
     </sequence>
    </complexType>
   </element>
+  <!-- operation request element -->
+  <element name="insert">
+   <complexType>
+    <sequence>
+     <element name="data" type="xsd:unsignedByte" minOccurs="1" maxOccurs="unbounded"/><!-- ns__insert::data -->
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation response element -->
+  <element name="insertResponse">
+   <complexType>
+    <sequence>
+     <element name="response" type="xsd:int" minOccurs="0" maxOccurs="1" nillable="true"/><!-- ns__insert::response -->
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation request element -->
+  <element name="remove">
+   <complexType>
+    <sequence>
+     <element name="interest" type="xsd:unsignedByte" minOccurs="1" maxOccurs="unbounded"/><!-- ns__remove::interest -->
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation response element -->
+  <element name="removeResponse">
+   <complexType>
+    <sequence>
+     <element name="response" type="xsd:int" minOccurs="0" maxOccurs="1" nillable="true"/><!-- ns__remove::response -->
+    </sequence>
+   </complexType>
+  </element>
  </schema>
 
 </types>
@@ -54,17 +86,61 @@
  <part name="Body" element="ns:readResponse"/>
 </message>
 
+<message name="insertRequest">
+ <part name="Body" element="ns:insert"/><!-- ns__insert::ns__insert -->
+</message>
+
+<message name="insertResponse">
+ <part name="Body" element="ns:insertResponse"/>
+</message>
+
+<message name="removeRequest">
+ <part name="Body" element="ns:remove"/><!-- ns__remove::ns__remove -->
+</message>
+
+<message name="removeResponse">
+ <part name="Body" element="ns:removeResponse"/>
+</message>
+
 <portType name="ServicePortType">
  <operation name="read">
   <documentation>Service definition of function ns__read</documentation>
   <input message="tns:readRequest"/>
   <output message="tns:readResponse"/>
  </operation>
+ <operation name="insert">
+  <documentation>Service definition of function ns__insert</documentation>
+  <input message="tns:insertRequest"/>
+  <output message="tns:insertResponse"/>
+ </operation>
+ <operation name="remove">
+  <documentation>Service definition of function ns__remove</documentation>
+  <input message="tns:removeRequest"/>
+  <output message="tns:removeResponse"/>
+ </operation>
 </portType>
 
 <binding name="Service" type="tns:ServicePortType">
  <SOAP:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
  <operation name="read">
+  <SOAP:operation soapAction=""/>
+  <input>
+     <SOAP:body parts="Body" use="literal"/>
+  </input>
+  <output>
+     <SOAP:body parts="Body" use="literal"/>
+  </output>
+ </operation>
+ <operation name="insert">
+  <SOAP:operation soapAction=""/>
+  <input>
+     <SOAP:body parts="Body" use="literal"/>
+  </input>
+  <output>
+     <SOAP:body parts="Body" use="literal"/>
+  </output>
+ </operation>
+ <operation name="remove">
   <SOAP:operation soapAction=""/>
   <input>
      <SOAP:body parts="Body" use="literal"/>

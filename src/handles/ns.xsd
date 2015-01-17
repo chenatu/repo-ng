@@ -25,5 +25,37 @@
     </sequence>
    </complexType>
   </element>
+  <!-- operation request element -->
+  <element name="insert">
+   <complexType>
+    <sequence>
+     <element name="data" type="xsd:unsignedByte" minOccurs="1" maxOccurs="unbounded"/><!-- ns__insert::data -->
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation response element -->
+  <element name="insertResponse">
+   <complexType>
+    <sequence>
+     <element name="response" type="xsd:int" minOccurs="0" maxOccurs="1" nillable="true"/><!-- ns__insert::response -->
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation request element -->
+  <element name="remove">
+   <complexType>
+    <sequence>
+     <element name="interest" type="xsd:unsignedByte" minOccurs="1" maxOccurs="unbounded"/><!-- ns__remove::interest -->
+    </sequence>
+   </complexType>
+  </element>
+  <!-- operation response element -->
+  <element name="removeResponse">
+   <complexType>
+    <sequence>
+     <element name="response" type="xsd:int" minOccurs="0" maxOccurs="1" nillable="true"/><!-- ns__remove::response -->
+    </sequence>
+   </complexType>
+  </element>
  </schema>
 
