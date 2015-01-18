@@ -76,6 +76,13 @@ public:
     threads_.join_all();
   }
 
+  void
+  stop()
+  {
+    io_service_.stop();
+    threads_.join_all();
+  }
+
   /// @brief Adds a task to the thread pool if a thread is currently available.
   template <typename Task>
   bool run_task(Task task)
@@ -122,7 +129,7 @@ static const uint64_t DEFAULT_BLOCK_SIZE = 1000;
 static const uint64_t DEFAULT_INTEREST_LIFETIME = 4000;
 static const uint64_t DEFAULT_FRESHNESS_PERIOD = 10000;
 static const uint64_t DEFAULT_CHECK_PERIOD = 1000;
-static const size_t PRE_SIGN_DATA_COUNT = 20;
+static const size_t PRE_SIGN_DATA_COUNT = 10;
 
 class SoapPutFile : ndn::noncopyable {
 public:
@@ -139,7 +146,7 @@ public:
     , m_timestampVersion(toUnixTimestamp(system_clock::now()).count())
     , m_currentSegmentNo(0)
     , m_isFinished(false)
-    , m_thread_pool(PRE_SIGN_DATA_COUNT * 2)
+    , m_thread_pool(PRE_SIGN_DATA_COUNT)
     {}
 
   void
@@ -186,6 +193,7 @@ private:
   DataContainer m_data;
 
   thread_pool m_thread_pool;
+  ndn::time::steady_clock::time_point startTime;
 };
 
 int
@@ -196,7 +204,11 @@ SoapPutFile::putData(ndn::Data& data)
   size_t rawDataSize = data.wireEncode().size();
   d.assign(rawData, rawData + rawDataSize);
   int response;
-  proxy.insert(d, &response);
+  std::cout << "before insert" << std::endl;
+  Proxy newProxy;
+  newProxy.soap_endpoint =server;
+  newProxy.insert(d, &response);
+  std::cout << "after insert" << std::endl;
   return response;
 }
 
@@ -276,13 +288,17 @@ SoapPutFile::startSegmentInsert()
       std::cout << "segment no: " << segmentNo << std::endl;
       DataContainer::iterator item = m_data.find(segmentNo);
       if (item == m_data.end()) {
-          std::cerr << "data segment not prepared" << std::endl;
+        std::cerr << "data segment not prepared" << std::endl;
+        ndn::time::steady_clock::time_point endTime = ndn::time::steady_clock::now();
+        std::cout << "segment put last time: " << ndn::time::duration_cast<ndn::time::milliseconds>(endTime - startTime) << " ms" << std::endl;
+        m_thread_pool.stop();
         return;
       }
       while (!m_thread_pool.run_task(boost::bind(&SoapPutFile::putData, this, *item->second)) && !threadError) {
         boost::this_thread::sleep(boost::posix_time::milliseconds(1));
         if (threadError) {
           throw Error("put segment data error");
+          m_thread_pool.stop();
           return;
         }
       }
@@ -325,6 +341,7 @@ SoapPutFile::startSingleInsert()
 void
 SoapPutFile::run()
 {
+  startTime = ndn::time::steady_clock::now();
   std::cout << "run" << std::endl;
   m_dataPrefix = ndnName;
   if (!isUnversioned)

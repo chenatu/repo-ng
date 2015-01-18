@@ -19,6 +19,7 @@ int Service::insert(std::vector<unsigned char >data, int*response) {
   std::cout << "write:" << std::endl;
   ndn::Data d(ndn::Block(data.data(), data.size()));
   std::cout << "data name: " << d.getName() << std::endl;
+  std::cout << "segment: " << d.getName().get(-1).toSegment() << std::endl;
   int res = 200;
   if (m_storageHandle.insertData(d)) {
     response = &res;

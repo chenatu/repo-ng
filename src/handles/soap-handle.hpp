@@ -88,16 +88,17 @@ public:
     int acceptFd = m_service.accept();
     std::cout << "after accept" << std::endl;
     if (acceptFd > 0) {
-      m_ioService.post(boost::bind(&SoapHandle::acceptHandle, this));
+      m_ioService.post(boost::bind(&SoapHandle::acceptHandle, this, m_service.copy()));
     }
     m_ioService.post(boost::bind(&SoapHandle::acceptOperation, this));
   }
 
   void
-  acceptHandle()
+  acceptHandle(Service* service)
   {
     std::cout << "serve" << std::endl;
-    m_service.serve();
+    service->serve();
+    service->destroy();
   }
 
 private:

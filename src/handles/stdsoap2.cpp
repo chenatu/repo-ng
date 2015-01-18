@@ -5185,6 +5185,7 @@ int
 SOAP_FMAC2
 soap_closesock(struct soap *soap)
 { register int status = soap->error;
+ printf("soap_closesock\n");
 #ifndef WITH_LEANER
   if (status) /* close on error: attachment state is not to be trusted */
   { soap->mime.first = NULL;
