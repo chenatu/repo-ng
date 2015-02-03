@@ -23,6 +23,7 @@
 #include "common.hpp"
 #include "skiplist.hpp"
 #include <queue>
+#include <set>
 
 namespace repo {
 
@@ -145,7 +146,8 @@ public:
 
 private:
 
-  typedef SkipList<Entry> IndexSkipList;
+  //typedef SkipList<Entry> IndexSkipList;
+  typedef std::set<Entry> IndexSkipList;
 
 public:
   explicit

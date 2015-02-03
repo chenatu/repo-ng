@@ -17,7 +17,7 @@
 #include <boost/bind.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include "../src/handles/soapProxy.h"
-#include "../src/handles/ns.nsmap"
+#include "../src/handles/ns.h"
 
 namespace repo {
 
@@ -125,7 +125,7 @@ using std::bind;
 using std::placeholders::_1;
 using std::placeholders::_2;
 
-static const uint64_t DEFAULT_BLOCK_SIZE = 1000;
+static const uint64_t DEFAULT_BLOCK_SIZE = 65535;
 static const uint64_t DEFAULT_INTEREST_LIFETIME = 4000;
 static const uint64_t DEFAULT_FRESHNESS_PERIOD = 10000;
 static const uint64_t DEFAULT_CHECK_PERIOD = 1000;
@@ -142,6 +142,7 @@ public:
     , timeout(0)
     , insertStream(0)
     , isVerbose(false)
+    , packetSize(DEFAULT_BLOCK_SIZE)
 
     , m_timestampVersion(toUnixTimestamp(system_clock::now()).count())
     , m_currentSegmentNo(0)
@@ -181,6 +182,7 @@ public:
   bool isVerbose;
   char* server;
   Proxy proxy;
+  int packetSize;
 
 private:
   ndn::KeyChain m_keyChain;
@@ -233,10 +235,10 @@ SoapPutFile::prepareNextData(uint64_t referenceSegmentNo)
   }
 
   for (size_t i = 0; i < nDataToPrepare && !m_isFinished; ++i) {
-    uint8_t buffer[DEFAULT_BLOCK_SIZE];
+    uint8_t buffer[packetSize];
 
     std::streamsize readSize =
-      boost::iostreams::read(*insertStream, reinterpret_cast<char*>(buffer), DEFAULT_BLOCK_SIZE);
+      boost::iostreams::read(*insertStream, reinterpret_cast<char*>(buffer), packetSize);
 
     if (readSize <= 0) {
       throw Error("Error reading from the input stream");
@@ -317,9 +319,9 @@ void
 SoapPutFile::startSingleInsert()
 {
   std::cout << "startSingleInsert" << std::endl;
-  uint8_t buffer[DEFAULT_BLOCK_SIZE];
+  uint8_t buffer[packetSize];
   std::streamsize readSize =
-    boost::iostreams::read(*insertStream, reinterpret_cast<char*>(buffer), DEFAULT_BLOCK_SIZE);
+    boost::iostreams::read(*insertStream, reinterpret_cast<char*>(buffer), packetSize);
 
   if (readSize <= 0) {
     throw Error("Error reading from the input stream");
@@ -386,7 +388,7 @@ main(int argc, char** argv)
 {
   SoapPutFile soapPutFile;
   int opt;
-  while ((opt = getopt(argc, argv, "usDi:x:w:vh")) != -1) {
+  while ((opt = getopt(argc, argv, "usDi:x:w:p:vh")) != -1) {
     switch (opt) {
     case 'u':
       soapPutFile.isUnversioned = true;
@@ -418,6 +420,9 @@ main(int argc, char** argv)
         std::cerr << "-w option should be an integer.";
         return 1;
       }
+      break;
+    case 'p':
+      soapPutFile.packetSize = boost::lexical_cast<int>(optarg);
       break;
     case 'v':
       soapPutFile.isVerbose = true;

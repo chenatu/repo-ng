@@ -148,6 +148,7 @@ Repo::Repo(boost::asio::io_service& ioService, const RepoConfig& config)
   , m_deleteHandle(m_face, m_storageHandle, m_keyChain, m_scheduler, m_validator)
   , m_tcpBulkInsertHandle(ioService, m_storageHandle)
   , m_soapHandle(ioService, m_storageHandle)
+  , m_reqHandle(m_face, m_storageHandle, m_keyChain, m_scheduler)
 
 {
   m_validator.load(config.validatorNode, config.repoConfigPath);
@@ -183,6 +184,7 @@ Repo::enableListening()
       m_writeHandle.listen(*it);
       m_watchHandle.listen(*it);
       m_deleteHandle.listen(*it);
+      m_reqHandle.listen(*it);
     }
 
   // Enable listening on TCP bulk insert addresses

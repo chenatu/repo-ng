@@ -2,7 +2,7 @@
 #define REPO_NG_TOOLS_SOAPGETFILE_HPP
 
 #include "../src/handles/soapProxy.h"
-#include "../src/handles/ns.nsmap"
+#include "../src/handles/ns.h"
 #include "../src/common.hpp"
 
 namespace repo {

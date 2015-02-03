@@ -23,6 +23,7 @@
 #include <sqlite3.h>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/info_parser.hpp>
+#include "../src/handles/ns.h"
 
 namespace repo {
 

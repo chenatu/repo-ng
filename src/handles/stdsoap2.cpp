@@ -53,6 +53,8 @@ A commercial use license is available from Genivia, Inc., contact@genivia.com
 
 #define GSOAP_LIB_VERSION 20821
 
+//#include "ns.h"
+
 #ifdef AS400
 # pragma convert(819)	/* EBCDIC to ASCII */
 #endif

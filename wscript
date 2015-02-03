@@ -43,6 +43,7 @@ def configure(conf):
         pass
 
     conf.define('DEFAULT_CONFIG_FILE', '%s/ndn/repo-ng.conf' % conf.env['SYSCONFDIR'])
+    conf.define('WITH_NONAMESPACES', 1)
 
     if not conf.options.with_sqlite_locking:
         conf.define('DISABLE_SQLITE3_FS_LOCKING', 1)

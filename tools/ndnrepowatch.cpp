@@ -27,6 +27,7 @@
 #include <string>
 #include <stdlib.h>
 #include <stdint.h>
+#include "../src/handles/ns.h"
 
 #include <boost/lexical_cast.hpp>
 

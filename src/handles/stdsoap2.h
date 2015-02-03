@@ -214,7 +214,7 @@ A commercial use license is available from Genivia, Inc., contact@genivia.com
 # endif
 #else
 # if defined(UNDER_CE)
-#  define SOAP_BUFLEN (8192)
+#  define SOAP_BUFLEN (131071)
 #  define SOAP_PTRHASH (32)
 #  define SOAP_IDHASH (19)
 #  define SOAP_BLKLEN (32)
@@ -572,7 +572,7 @@ A commercial use license is available from Genivia, Inc., contact@genivia.com
 /* older OpenVMS TCP/IP stacks cannot handle 65536 bytes */
 #ifdef __VMS
 # ifndef SOAP_BUFLEN
-#  define SOAP_BUFLEN (65535)
+#  define SOAP_BUFLEN (131071)
 # endif
 #endif
 
@@ -591,7 +591,7 @@ A commercial use license is available from Genivia, Inc., contact@genivia.com
 #endif
 
 #ifdef TANDEM_NONSTOP /* Support for Guardian */
-# define SOAP_BUFLEN (32767)
+# define SOAP_BUFLEN (131071)
 /*# define WITH_NOSTDLIB */ /* uncommment to remove stdlib dependences */
 # define WITH_NOIO      /* no IO dependences, e.g. remove TCP/IP */
 # define int32_t int
@@ -604,7 +604,7 @@ A commercial use license is available from Genivia, Inc., contact@genivia.com
 # undef HAVE_GMTIME_R
 # undef HAVE_LOCALTIME_R
 # undef HAVE_SNPRINTF
-# define SOAP_BUFLEN (32767)
+# define SOAP_BUFLEN (131071)
 # define SOAP_SOCKET short
 #pragma nolist
 # include <sys\param.h>
@@ -622,7 +622,7 @@ A commercial use license is available from Genivia, Inc., contact@genivia.com
 #pragma list                                                  
 #elif defined(__TANDEM) /* Support for OSS */
 # define int32_t int
-# define SOAP_BUFLEN (32767)
+# define SOAP_BUFLEN (131071)
 #endif                                                        
 
 #ifndef WITH_NOSTDLIB
@@ -1031,9 +1031,9 @@ extern "C" {
 
 #ifndef SOAP_BUFLEN
 # if !defined(WITH_LEAN)
-#  define SOAP_BUFLEN (65536) /* buffer length for socket packets, also used by gethostbyname_r and UDP messages, so don't make this too small */
+#  define SOAP_BUFLEN (131071) /* buffer length for socket packets, also used by gethostbyname_r and UDP messages, so don't make this too small */
 # else
-#  define SOAP_BUFLEN  (2048) /* lean size */
+#  define SOAP_BUFLEN  (131071) /* lean size */
 # endif
 #endif
 #ifndef SOAP_LABLEN

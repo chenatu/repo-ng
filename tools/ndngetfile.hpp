@@ -21,6 +21,7 @@
 #define REPO_NG_TOOLS_NDNGETFILE_HPP
 
 #include <ndn-cxx/face.hpp>
+#include "../src/handles/ns.h"
 
 namespace repo {
 

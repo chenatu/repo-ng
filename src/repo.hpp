@@ -30,6 +30,7 @@
 #include "handles/delete-handle.hpp"
 #include "handles/tcp-bulk-insert-handle.hpp"
 #include "handles/soap-handle.hpp"
+#include "handles/req-handle.hpp"
 
 #include "common.hpp"
 
@@ -97,6 +98,7 @@ private:
   DeleteHandle m_deleteHandle;
   TcpBulkInsertHandle m_tcpBulkInsertHandle;
   SoapHandle m_soapHandle;
+  ReqHandle m_reqHandle;
 };
 
 } // namespace repo

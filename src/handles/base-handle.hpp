@@ -75,6 +75,12 @@ protected:
     return m_scheduler;
   }
 
+  inline KeyChain&
+  getKeyChain()
+  {
+    return m_keyChain;
+  }
+
   // inline RepoStorage&
   // getStoreIndex()
   // {

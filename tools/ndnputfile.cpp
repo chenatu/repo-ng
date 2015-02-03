@@ -33,6 +33,7 @@
 #include <boost/asio.hpp>
 #include <boost/iostreams/operations.hpp>
 #include <boost/iostreams/read.hpp>
+#include "../src/handles/ns.h"
 
 namespace repo {
 
