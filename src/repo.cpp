@@ -147,7 +147,7 @@ Repo::Repo(boost::asio::io_service& ioService, const RepoConfig& config)
   , m_watchHandle(m_face, m_storageHandle, m_keyChain, m_scheduler, m_validator)
   , m_deleteHandle(m_face, m_storageHandle, m_keyChain, m_scheduler, m_validator)
   , m_tcpBulkInsertHandle(ioService, m_storageHandle)
-  , m_soapHandle(ioService, m_storageHandle)
+  //, m_soapHandle(ioService, m_storageHandle)
   , m_reqHandle(m_face, m_storageHandle, m_keyChain, m_scheduler)
 
 {
@@ -195,12 +195,12 @@ Repo::enableListening()
       m_tcpBulkInsertHandle.listen(it->first, it->second);
     }
 
-    for (auto it = m_config.soapEndpoints.begin();
+/*    for (auto it = m_config.soapEndpoints.begin();
        it != m_config.soapEndpoints.end();
        ++it)
     {
       m_soapHandle.listen(it->first.c_str(), it->second);
-    }
+    }*/
 }
 
 void
@@ -212,7 +212,7 @@ Repo::enableValidation()
 void
 Repo::close()
 {
-  m_soapHandle.stop();
+  //m_soapHandle.stop();
 }
 
 } // namespace repo

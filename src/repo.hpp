@@ -97,7 +97,7 @@ private:
   WatchHandle m_watchHandle;
   DeleteHandle m_deleteHandle;
   TcpBulkInsertHandle m_tcpBulkInsertHandle;
-  SoapHandle m_soapHandle;
+  // SoapHandle m_soapHandle;
   ReqHandle m_reqHandle;
 };
 

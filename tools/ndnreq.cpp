@@ -172,7 +172,6 @@ NdnReq::onReqData(const ndn::Interest& interest, ndn::Data& data) {
 void
 NdnReq::onReqTimeout(const ndn::Interest& interest) {
   m_timeoutCount++;
-  std::cout << "timeout" << std::endl;
   if (m_sentCount.load() < limit) {
     expressReqInterest();
   }
