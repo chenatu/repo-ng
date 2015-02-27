@@ -198,8 +198,8 @@ usage()
           "  -l: InterestLifetime in milliseconds for each command\n"
           "  -w: total count for interest (default 10000)\n"
           "  -o: outputfile name (default std::out)\n"
-          "  -p: pipline"
-          "  -t: timeout"
+          "  -p: pipline\n"
+          "  -t: timeout\n"
           "  repo-prefix: repo command prefix\n"
           );
   exit(1);

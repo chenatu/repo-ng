@@ -20,13 +20,13 @@ def main(argv):
 def ndnRepo242(argv):
 	p1 = subprocess.Popen("ndn-repo-ng")
 	p2 = subprocess.Popen("ndn-repo-ng")
-	time.sleep(6)
+	time.sleep(30)
 	p3 = subprocess.Popen("ndn-repo-ng")
 	p4 = subprocess.Popen("ndn-repo-ng")
-	time.sleep(6)
+	time.sleep(30)
 	p3.terminate();
 	p4.terminate();
-	time.sleep(6)
+	time.sleep(30)
 	p1.terminate()
 	p2.terminate()
 
@@ -34,21 +34,29 @@ def ndnMultiReqClient(argv):
 	for index in range(len(argv)):
 		if argv[index] == '-n':
 			n = int(argv[index + 1])
+			argv.pop(index + 1)
+			argv.pop(index)
 			break;
-	argv.pop(index + 1)
-	argv.pop(index)
 	# d: duration
 	for index in range(len(argv)):
 		if argv[index] == '-d':
 			d = int(argv[index + 1])
+			argv.pop(index)
+			argv.pop(index + 1)
 			break;
-	argv.pop(index + 1)
-	argv.pop(index)
+
+
+	for oIndex in range(len(argv)):
+		if argv[oIndex] == '-o':
+			filename = argv[oIndex + 1]
+			break;
 	argv[0] = 'ndnreq'
 	process = []
 	for i in range(n):
+		if 'filename' in locals():
+			argv[oIndex + 1] = filename + str(i)
 		process.append(subprocess.Popen(argv))
-	if d is not None:
+	if 'd' in locals():
 		time.sleep(d)
 		for p in process:
 			p.terminate()
