@@ -109,6 +109,7 @@ private:
   std::atomic_int m_timeoutCount;
   std::chrono::system_clock::time_point m_start;
   boost::thread_group m_threads;
+  int m_prevCount = 0;
 };
 
 void
@@ -138,7 +139,8 @@ void
 NdnReq::checkStatus()
 {
   auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - m_start);
-  os << duration.count() << " " << m_sentCount.load() << " " << m_recvCount.load() << " " << m_timeoutCount.load() << " " <<  (double)m_recvCount.load() * 1000 / (double)duration.count() << std::endl;
+  os << duration.count() << " " << m_sentCount.load() << " " << m_recvCount.load() << " " << m_timeoutCount.load() << " " <<  m_recvCount.load() - m_prevCount << std::endl;
+  m_prevCount = m_recvCount.load();
   m_scheduler.scheduleEvent(milliseconds(checkPeriod),
                           bind(&NdnReq::checkStatus, this));
 }
