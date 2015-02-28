@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import sys, subprocess, getopt, time, threading
+import sys, subprocess, getopt, time, threading, fileinput
 
 def main(argv):
 	for index in range(len(argv)):
@@ -16,6 +16,8 @@ def main(argv):
 		ndnMultiReqClient(argv)
 	if function == '3':
 		ndnRepo43234(argv)
+	if function == '4':
+		ndnCalRes(argv)
 
 def ndnRepo242(argv):
 	p1 = subprocess.Popen("ndn-repo-ng")
@@ -31,6 +33,7 @@ def ndnRepo242(argv):
 	p2.terminate()
 
 def ndnMultiReqClient(argv):
+	n = 1
 	for index in range(len(argv)):
 		if argv[index] == '-n':
 			n = int(argv[index + 1])
@@ -79,6 +82,42 @@ def ndnRepo43234(argv):
 	p2.terminate()
 	p3.terminate()
 	p4.terminate()
+
+def ndnCalRes(argv):
+	for index in range(len(argv)):
+		if argv[index] == '-o':
+			filename = argv[index + 1]
+			break;
+
+	for index in range(len(argv)):
+		if argv[index] == '-n':
+			n = int(argv[index + 1])
+			break;
+	if ('filename' not in locals()) or ('n' not in locals()):
+		return
+
+	files = []
+	for i in range(n):
+		files.append(open(filename + str(i)))
+	min_lines = 0;
+	for i in range(n):
+		num_lines = sum(1 for line in files[i])
+		if (min_lines == 0) or (num_lines < min_lines):
+			min_lines = num_lines
+	logFile = open(filename, 'w')
+	speeds = [0] * min_lines
+	print('min_lines ' + str(min_lines))
+	for file_object in files:
+		file_object.seek(0)
+		for i in range(min_lines):
+			line = file_object.readline()
+			speeds[i] = speeds[i] + int((line.split())[4])
+
+		file_object.close()
+	for i in range(len(speeds)):
+		logFile.write(str(i*1000) + ' ' + str(speeds[i]) + ' ' + '\n')
+	logFile.close()
+
 
 def usage():
 	print("repo-control.py")
