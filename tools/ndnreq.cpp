@@ -29,7 +29,7 @@ static const uint64_t DEFAULT_PIPELINE = 20;
 
 using namespace ndn::time;
 
-static std::mt19937_64 m_rng(std::chrono::system_clock::now().time_since_epoch().count());
+static std::mt19937_64 m_rng(ndn::time::system_clock::now().time_since_epoch().count());
 
 class NdnReq : ndn::noncopyable
 {
@@ -45,8 +45,8 @@ public:
     }
   };
 
-  NdnReq(bool hasLimit, int limit, bool hasTimeout, milliseconds timeout, ndn::Name repoPrefix,
-    std::ostream& os, int pipeline, uint64_t interestLifetime)
+  NdnReq(bool hasLimit, int limit, bool hasTimeout, ndn::time::milliseconds timeout, ndn::Name repoPrefix,
+    std::ostream& os, int pipeline, uint64_t interestLifetime, bool hasInterval, milliseconds interval)
     : hasLimit(hasLimit)
     , limit(limit)
     , hasTimeout(hasTimeout)
@@ -56,6 +56,8 @@ public:
     , checkPeriod(DEFAULT_CHECK_PERIOD)
     , pipeline(DEFAULT_PIPELINE)
     , interestLifetime(DEFAULT_INTEREST_LIFETIME)
+    , hasInterval(hasInterval)
+    , interval(interval)
 
     , m_scheduler(m_face.getIoService())
     , m_sentCount(0)
@@ -93,12 +95,14 @@ public:
   bool hasLimit;
   int limit;
   bool hasTimeout;
-  milliseconds timeout;
+  ndn::time::milliseconds timeout;
   ndn::Name repoPrefix;
   std::ostream& os;
-  milliseconds checkPeriod;
+  ndn::time::milliseconds checkPeriod;
   int pipeline;
   uint64_t interestLifetime;
+  bool hasInterval;
+  ndn::time::milliseconds interval;
   //static std::mt19937_64 m_rng;
 
 private:
@@ -107,7 +111,7 @@ private:
   std::atomic_int m_sentCount;
   std::atomic_int m_recvCount;
   std::atomic_int m_timeoutCount;
-  std::chrono::system_clock::time_point m_start;
+  ndn::time::system_clock::time_point m_start;
   boost::thread_group m_threads;
   int m_prevCount = 0;
 };
@@ -118,10 +122,10 @@ NdnReq::run()
   if (hasTimeout)
     m_scheduler.scheduleEvent(timeout, bind(&NdnReq::stopProcess, this));
 
-  m_scheduler.scheduleEvent(milliseconds(checkPeriod),
+  m_scheduler.scheduleEvent(ndn::time::milliseconds(checkPeriod),
                             bind(&NdnReq::checkStatus, this));
 
-  m_start = std::chrono::system_clock::now();
+  m_start = ndn::time::system_clock::now();
   start();
   m_face.processEvents();
 }
@@ -138,10 +142,10 @@ NdnReq::stopProcess()
 void
 NdnReq::checkStatus()
 {
-  auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - m_start);
+  auto duration = ndn::time::duration_cast<ndn::time::milliseconds>(ndn::time::system_clock::now() - m_start);
   os << duration.count() << " " << m_sentCount.load() << " " << m_recvCount.load() << " " << m_timeoutCount.load() << " " <<  m_recvCount.load() - m_prevCount << std::endl;
   m_prevCount = m_recvCount.load();
-  m_scheduler.scheduleEvent(milliseconds(checkPeriod),
+  m_scheduler.scheduleEvent(ndn::time::milliseconds(checkPeriod),
                           bind(&NdnReq::checkStatus, this));
 }
 
@@ -152,18 +156,23 @@ NdnReq::expressReqInterest()
   ndn::Name reqName(repoPrefix);
   reqName.append("req").append(std::to_string(m_rng()).c_str());
   ndn::Interest reqInterest(reqName);
-  reqInterest.setInterestLifetime(milliseconds(interestLifetime));
+  reqInterest.setInterestLifetime(ndn::time::milliseconds(interestLifetime));
   m_face.expressInterest(reqInterest,
                          bind(&NdnReq::onReqData, this, _1, _2),
                          bind(&NdnReq::onReqTimeout, this, _1));
   m_sentCount++;
+  if (hasInterval)
+    m_scheduler.scheduleEvent(ndn::time::milliseconds(interval),
+                          bind(&NdnReq::expressReqInterest, this));
 }
+
 
 void
 NdnReq::onReqData(const ndn::Interest& interest, ndn::Data& data) {
   m_recvCount++;
   if (m_sentCount.load() < limit) {
-    expressReqInterest();
+    if (!hasInterval)
+      expressReqInterest();
   }
   else {
     std::cout << "exceed limit:" << limit << std::endl;
@@ -186,15 +195,20 @@ NdnReq::onReqTimeout(const ndn::Interest& interest) {
 void
 NdnReq::start()
 {
-  for (int i = 0; i < pipeline; i++)
-    m_threads.create_thread(boost::bind(&NdnReq::expressReqInterest, this));
+  if (!hasInterval) {
+    for (int i = 0; i < pipeline; i++)
+      m_threads.create_thread(boost::bind(&NdnReq::expressReqInterest, this));
+  }
+  else {
+    expressReqInterest();
+  }
 }
 
 static void
 usage()
 {
   fprintf(stderr,
-          "ndnreq [-l] [-w] [-o] [-p] [-t] repo-prefix"
+          "ndnreq [-l] [-w] [-o] [-p] [-t] [-i] repo-prefix"
           "\n"
           " Write a file into a repo.\n"
           "  -l: InterestLifetime in milliseconds for each command\n"
@@ -202,6 +216,7 @@ usage()
           "  -o: outputfile name (default std::out)\n"
           "  -p: pipline\n"
           "  -t: timeout\n"
+          "  -i: interst expressing interval (better to come up with -t option)\n"
           "  repo-prefix: repo command prefix\n"
           );
   exit(1);
@@ -217,10 +232,12 @@ main(int argc, char** argv)
   int limit = 0;
   int pipeline = 0;
   bool hasTimeout = false;
-  milliseconds timeout;
+  ndn::time::milliseconds timeout;
+  bool hasInterval = false;
+  ndn::time::milliseconds interval;
 
   int opt;
-  while ((opt = getopt(argc, argv, "l:w:o:t:p:")) != -1)
+  while ((opt = getopt(argc, argv, "l:w:o:t:p:i:")) != -1)
     {
       switch (opt) {
       case 'l':
@@ -246,6 +263,18 @@ main(int argc, char** argv)
             return 1;
           }
         break;
+      case 'i':
+        try
+          {
+            hasInterval = true;
+            interval = ndn::time::milliseconds(boost::lexical_cast<int>(optarg));
+          }
+        catch (boost::bad_lexical_cast&)
+          {
+            std::cerr << "ERROR: -i option should be an integer." << std::endl;
+            return 1;
+          }
+        break;
       case 'p':
         try
           {
@@ -262,7 +291,7 @@ main(int argc, char** argv)
         try
           {
             hasTimeout = true;
-            timeout = milliseconds(boost::lexical_cast<int>(optarg));
+            timeout = ndn::time::milliseconds(boost::lexical_cast<int>(optarg));
           }
         catch (boost::bad_lexical_cast&)
           {
@@ -309,7 +338,8 @@ main(int argc, char** argv)
 
   std::ostream os(buf);
 
-  NdnReq ndnReq(hasLimit, limit, hasTimeout, timeout, repoPrefix, os, pipeline, interestLifetime);
+  NdnReq ndnReq(hasLimit, limit, hasTimeout, timeout, repoPrefix, os, pipeline,
+                interestLifetime, hasInterval, interval);
 
   ndnReq.run();
 
