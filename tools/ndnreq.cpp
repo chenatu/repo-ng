@@ -23,7 +23,7 @@ using std::placeholders::_1;
 using std::placeholders::_2;
 
 static const uint64_t DEFAULT_INTEREST_LIFETIME = 4000;
-static const uint64_t DEFAULT_CHECK_PERIOD = 1000;
+static const uint64_t DEFAULT_CHECK_PERIOD = 100;
 static const uint64_t DEFAULT_LIMIT = 10000;
 static const uint64_t DEFAULT_PIPELINE = 20;
 
@@ -184,7 +184,8 @@ void
 NdnReq::onReqTimeout(const ndn::Interest& interest) {
   m_timeoutCount++;
   if (m_sentCount.load() < limit) {
-    expressReqInterest();
+    if (!hasInterval)
+      expressReqInterest();
   }
   else {
     std::cout << "exceed limit" << std::endl;
