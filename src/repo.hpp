@@ -69,7 +69,7 @@ public:
   };
 
 public:
-  Repo(boost::asio::io_service& ioService, const RepoConfig& config);
+  Repo(boost::asio::io_service& ioService, const RepoConfig& config, bool hasOutput, std::ostream& os);
 
   //@brief rebuild index from storage file when repo starts.
   void
@@ -98,6 +98,8 @@ private:
   DeleteHandle m_deleteHandle;
   TcpBulkInsertHandle m_tcpBulkInsertHandle;
   // SoapHandle m_soapHandle;
+  bool hasOutput;
+  std::ostream& os;
   ReqHandle m_reqHandle;
 };
 

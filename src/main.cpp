@@ -57,14 +57,20 @@ int
 main(int argc, char** argv)
 {
   std::string configPath = DEFAULT_CONFIG_FILE;
+  bool hasOutput = false;
+  char* outputFile = NULL;
   int opt;
-  while ((opt = getopt(argc, argv, "hc:")) != -1) {
+  while ((opt = getopt(argc, argv, "hc:o:")) != -1) {
     switch (opt) {
     case 'h':
       std::cout << argv[0] << ndnRepoUsageMessage << std::endl;
       return 1;
     case 'c':
       configPath = std::string(optarg);
+      break;
+    case 'o':
+      hasOutput = true;
+      outputFile = optarg;
       break;
     default:
       break;
@@ -73,7 +79,22 @@ main(int argc, char** argv)
 
   try {
     boost::asio::io_service ioService;
-    repo::Repo repoInstance(ioService, repo::parseConfig(configPath));
+
+    std::streambuf* buf;
+    std::ofstream of;
+
+    if (hasOutput)
+    {
+      of.open(outputFile, std::ios::out | std::ios::binary | std::ios::trunc);
+      if (!of || !of.is_open()) {
+        std::cerr << "ERROR: cannot open " << outputFile << std::endl;
+        return 1;
+      }
+      buf = of.rdbuf();
+    }
+
+    std::ostream os(buf);
+    repo::Repo repoInstance(ioService, repo::parseConfig(configPath), hasOutput, of);
 
     boost::asio::signal_set signalSet(ioService);
     signalSet.add(SIGINT);

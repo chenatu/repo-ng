@@ -20,23 +20,39 @@
 #ifndef REPO_HANDLES_REQ_HANDLE_HPP
 #define REPO_HANDLES_REQ_HANDLE_HPP
 
+#include <boost/lexical_cast.hpp>
+#include <atomic>
 #include "base-handle.hpp"
 
 
 namespace repo {
+
+static const uint64_t DEFAULT_CHECK_PERIOD = 100;
 
 class ReqHandle : public BaseHandle
 {
 
 public:
   ReqHandle(Face& face, RepoStorage& storageHandle, KeyChain& keyChain,
-             Scheduler& scheduler)
+             Scheduler& scheduler, bool hasOutput, std::ostream& os)
     : BaseHandle(face, storageHandle, keyChain, scheduler)
+    , hasOutput(hasOutput)
+    , os(os)
+    , m_prevCount(0)
+    , m_recvCount(0)
   {
+    if (hasOutput) {
+      m_scheduler.scheduleEvent(ndn::time::milliseconds(DEFAULT_CHECK_PERIOD),
+                              bind(&ReqHandle::checkStatus, this));
+    }
   }
 
   virtual void
   listen(const Name& prefix);
+
+public:
+  bool hasOutput;
+  std::ostream& os;
 
 private:
   /**
@@ -47,6 +63,14 @@ private:
 
   void
   onRegisterFailed(const Name& prefix, const std::string& reason);
+
+  void
+  checkStatus();
+
+private:
+  std::atomic_int m_recvCount;
+  int m_prevCount;
+  ndn::time::system_clock::time_point m_start;
 };
 
 } // namespace repo

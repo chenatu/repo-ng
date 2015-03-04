@@ -135,7 +135,7 @@ parseConfig(const std::string& configPath)
   return repoConfig;
 }
 
-Repo::Repo(boost::asio::io_service& ioService, const RepoConfig& config)
+Repo::Repo(boost::asio::io_service& ioService, const RepoConfig& config, bool hasOutput, std::ostream& os)
   : m_config(config)
   , m_scheduler(ioService)
   , m_face(ioService)
@@ -148,7 +148,9 @@ Repo::Repo(boost::asio::io_service& ioService, const RepoConfig& config)
   , m_deleteHandle(m_face, m_storageHandle, m_keyChain, m_scheduler, m_validator)
   , m_tcpBulkInsertHandle(ioService, m_storageHandle)
   //, m_soapHandle(ioService, m_storageHandle)
-  , m_reqHandle(m_face, m_storageHandle, m_keyChain, m_scheduler)
+  , hasOutput(hasOutput)
+  , os(os)
+  , m_reqHandle(m_face, m_storageHandle, m_keyChain, m_scheduler, hasOutput, os)
 
 {
   m_validator.load(config.validatorNode, config.repoConfigPath);

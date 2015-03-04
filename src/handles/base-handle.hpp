@@ -104,7 +104,7 @@ protected:
   void
   extractParameter(const Interest& interest, const Name& prefix, RepoCommandParameter& parameter);
 
-private:
+public:
 
   Face& m_face;
   RepoStorage& m_storageHandle;

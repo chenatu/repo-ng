@@ -28,6 +28,7 @@ ReqHandle::onInterest(const Name& prefix, const Interest& interest)
   shared_ptr<ndn::Data> data = make_shared<ndn::Data>(interest.getName());
   getKeyChain().sign(*data);
   getFace().put(*data);
+  m_recvCount++;
 }
 
 void
@@ -44,6 +45,17 @@ ReqHandle::listen(const Name& prefix)
   getFace().setInterestFilter(filter,
                               bind(&ReqHandle::onInterest, this, _1, _2),
                               bind(&ReqHandle::onRegisterFailed, this, _1, _2));
+  m_start = ndn::time::system_clock::now();
+}
+
+void
+ReqHandle::checkStatus()
+{
+  auto duration = ndn::time::duration_cast<ndn::time::milliseconds>(ndn::time::system_clock::now() - m_start);
+  os << duration.count() << " " << m_recvCount.load() << " " << m_recvCount.load() - m_prevCount << std::endl;
+  m_prevCount = m_recvCount.load();
+  m_scheduler.scheduleEvent(ndn::time::milliseconds(DEFAULT_CHECK_PERIOD),
+                          bind(&ReqHandle::checkStatus, this));
 }
 
 } //namespace repo
