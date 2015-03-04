@@ -15,7 +15,7 @@ def main(argv):
 	if function == '2':
 		ndnMultiReqClient(argv)
 	if function == '3':
-		ndnRepo43234(argv)
+		ndnRepo23432(argv)
 	if function == '4':
 		ndnCalRes(argv)
 
@@ -64,24 +64,20 @@ def ndnMultiReqClient(argv):
 		for p in process:
 			p.terminate()
 
-def ndnRepo43234(argv):
-	p1 = subprocess.Popen("ndn-repo-ng")
-	p2 = subprocess.Popen("ndn-repo-ng")
-	p3 = subprocess.Popen("ndn-repo-ng")
-	p4 = subprocess.Popen("ndn-repo-ng")
+def ndnRepo23432(argv):
+	p1 = subprocess.Popen(["ndn-repo-ng", "-o", "repo-log1"])
+	p2 = subprocess.Popen(["ndn-repo-ng", "-o", "repo-log2"])
 	time.sleep(10)
-	p1.terminate();
+	p3 = subprocess.Popen(["ndn-repo-ng", "-o", "repo-log3"])
 	time.sleep(10)
-	p2.terminate();
+	p4 = subprocess.Popen(["ndn-repo-ng", "-o", "repo-log4"])
 	time.sleep(10)
-	p1 = subprocess.Popen("ndn-repo-ng")
+	p4.kill()
 	time.sleep(10)
-	p2 = subprocess.Popen("ndn-repo-ng")
+	p3.kill()
 	time.sleep(10)
-	p1.terminate()
-	p2.terminate()
-	p3.terminate()
-	p4.terminate()
+	p1.kill()
+	p2.kill()
 
 def ndnCalRes(argv):
 	for index in range(len(argv)):
